@@ -1,0 +1,41 @@
+package ${template.getPackageComplete()}.client.rest.microprofile;
+
+import io.smallrye.mutiny.Uni;
+import ${template.getPackageComplete()}.model.${template.getNameCapitalize()}Model;
+import ${template.getPackageComplete()}.request.parameter.${template.getNameCapitalize()}RequestParameter;
+import org.eclipse.microprofile.rest.client.annotation.RegisterClientHeaders;
+import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.MediaType;
+import io.samancore.common.model.PageData;
+import io.samancore.common.page.PageRequest;
+
+@ApplicationScoped
+@RegisterRestClient(configKey = "${template.getRestClientConfigKey()}")
+@RegisterClientHeaders
+@Path("/")
+@Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
+public interface ${template.getNameCapitalize()}RestClient {
+
+    @GET
+    @Path("/{id}")
+    Uni<${template.getNameCapitalize()}Model> getById(@PathParam("id") Long id);
+
+    @POST
+    @Path("/")
+    Uni<${template.getNameCapitalize()}Model> create(${template.getNameCapitalize()}Model model);
+
+    @PUT
+    @Path("/")
+    Uni<${template.getNameCapitalize()}Model> update(${template.getNameCapitalize()}Model model);
+
+    @DELETE
+    @Path("/{id}")
+    Uni<Boolean> deleteById(@PathParam("id") Long id);
+
+    @GET
+    @Path("/")
+    Uni<PageData<${template.getNameCapitalize()}Model>> getPage(PageRequest pageRequest);
+}

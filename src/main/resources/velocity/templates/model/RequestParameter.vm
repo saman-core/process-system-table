@@ -1,0 +1,19 @@
+package ${template.getPackageComplete()}.request.parameter;
+
+import lombok.Builder;
+import lombok.Value;
+import lombok.extern.jackson.Jacksonized;
+
+@Value
+@Jacksonized
+@Builder(
+    setterPrefix = "set",
+    builderMethodName = "newBuilder",
+    toBuilder = true
+)
+public class ${template.getNameCapitalize()}RequestParameter {
+    Long id;
+#foreach ($field in $template.getAllFieldToFilter())
+    ${field.getObjectTypeToModel()} ${field.getKey()};
+#end
+}

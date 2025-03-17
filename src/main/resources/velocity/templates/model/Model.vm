@@ -1,0 +1,27 @@
+package ${template.getPackageComplete()}.model;
+
+import lombok.Builder;
+import lombok.Value;
+import lombok.extern.jackson.Jacksonized;
+#if($template.validateIfAnyFieldHasValidation())
+import jakarta.validation.constraints.*;
+import io.samancore.common.model.validation.*;
+#end
+
+@Value
+@Jacksonized
+@Builder(
+    setterPrefix = "set",
+    builderMethodName = "newBuilder",
+    toBuilder = true
+)
+public class ${template.getNameCapitalize()}Model {
+    Long id;
+#foreach ($field in $template.getFields())
+    #set ($validations = ${field.getValidationToModel()})
+    #foreach($validation in $validations)
+    $validation
+    #end
+    ${field.getObjectTypeToModel()} ${field.getKey()};
+#end
+}

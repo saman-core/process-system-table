@@ -1,0 +1,80 @@
+package ${template.getPackageComplete()}.service.impl;
+
+import ${template.getPackageComplete()}.model.${template.getNameCapitalize()}Model;
+import ${template.getPackageComplete()}.request.parameter.${template.getNameCapitalize()}RequestParameter;
+import ${template.getPackageComplete()}.repository.${template.getNameCapitalize()}Repository;
+import ${template.getPackageComplete()}.service.${template.getNameCapitalize()}Service;
+import ${template.getPackageComplete()}.transformer.${template.getNameCapitalize()}Transformer;
+import io.samancore.common.error.exception.BusinessException;
+import io.samancore.common.error.message.BusinessExceptionsEnum;
+import io.smallrye.mutiny.Uni;
+import io.samancore.common.util.ConditionsUtil;
+import io.samancore.condition_template.client.ConditionTemplateClient;
+import io.samancore.common.error.message.TechnicalExceptionsEnum;
+import io.samancore.common.error.util.ExceptionHandler;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.samancore.common.bean.jackson.CustomObjectMapper;
+
+import jakarta.validation.Validation;
+import jakarta.validation.ValidatorFactory;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import org.jboss.logging.Logger;
+import io.samancore.common.model.PageData;
+import io.samancore.common.page.PageRequest;
+import io.samancore.common.page.PageUtil;
+
+@ApplicationScoped
+public class ${template.getNameCapitalize()}ServiceImpl implements ${template.getNameCapitalize()}Service {
+
+    @Inject
+    ${template.getNameCapitalize()}Repository repository;
+
+    @Inject
+    ${template.getNameCapitalize()}Transformer transformer;
+
+    @Inject
+    Logger log;
+
+    @Inject
+    ConditionTemplateClient conditionTemplateClient;
+
+    @Override
+    public Uni<${template.getNameCapitalize()}Model> getById(Long id) {
+        log.debugf("${template.getNameCapitalize()}RepositoryReactivePanache.getById %d ", id);
+        return repository.getById(id)
+                .onItem().transform(entity -> transformer.toModel(entity));
+    }
+
+    @Override
+    public Uni<${template.getNameCapitalize()}Model> create(${template.getNameCapitalize()}Model model) {
+        log.debugf("${template.getNameCapitalize()}RepositoryReactivePanache.create %s ", model);
+        return repository.create(transformer.toEntity(model))
+                .onItem().transform(entity -> transformer.toModel(entity));
+    }
+
+    @Override
+    public Uni<${template.getNameCapitalize()}Model> update(${template.getNameCapitalize()}Model model) {
+        log.debugf("${template.getNameCapitalize()}RepositoryReactivePanache.update %s ", model);
+        return repository.update(transformer.toEntity(model))
+                .onItem().transform(entity -> transformer.toModel(entity));
+    }
+
+    @Override
+    public Uni<Boolean> deleteById(Long id) {
+        log.debugf("${template.getNameCapitalize()}RepositoryReactivePanache.deleteById %d ", id);
+        return repository.delete(id);
+    }
+
+    @Override
+    public Uni<PageData<${template.getNameCapitalize()}Model>> getPage(${template.getNameCapitalize()}RequestParameter requestParameter, PageRequest pageRequest) {
+        log.debugf("${template.getNameCapitalize()}RepositoryReactivePanache.getPage %s ", pageRequest);
+        return repository.getPage(requestParameter, pageRequest)
+                .onItem().transform(page -> PageUtil.toPageModel(page, transformer::toModel));
+    }
+}

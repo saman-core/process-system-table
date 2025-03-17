@@ -1,0 +1,55 @@
+package ${template.getPackageComplete()}.client.rest;
+
+import ${template.getPackageComplete()}.client.${template.getNameCapitalize()}Client;
+import ${template.getPackageComplete()}.client.rest.microprofile.${template.getNameCapitalize()}RestClient;
+import ${template.getPackageComplete()}.model.${template.getNameCapitalize()}Model;
+import ${template.getPackageComplete()}.request.parameter.${template.getNameCapitalize()}RequestParameter;
+import io.smallrye.mutiny.Uni;
+import org.eclipse.microprofile.rest.client.inject.RestClient;
+import org.jboss.logging.Logger;
+
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import io.samancore.common.model.PageData;
+import io.samancore.common.page.PageRequest;
+
+@ApplicationScoped
+public class ${template.getNameCapitalize()}RestClientWrapper implements ${template.getNameCapitalize()}Client {
+
+    @Inject
+    Logger log;
+
+    @Inject
+    @RestClient
+    ${template.getNameCapitalize()}RestClient service;
+
+    @Override
+    public Uni<${template.getNameCapitalize()}Model> getById(Long id) {
+        log.debugf("${template.getNameCapitalize()}RestClientWrapper.getById %d", id);
+        return service.getById(id);
+    }
+
+    @Override
+    public Uni<${template.getNameCapitalize()}Model> create(${template.getNameCapitalize()}Model model) {
+        log.debug("${template.getNameCapitalize()}RestClientWrapper.create");
+        return service.create(model);
+    }
+
+    @Override
+    public Uni<${template.getNameCapitalize()}Model> update(${template.getNameCapitalize()}Model model) {
+        log.debugf("${template.getNameCapitalize()}RestClientWrapper.update %d", model.getId());
+        return service.update(model);
+    }
+
+    @Override
+    public Uni<Boolean> deleteById(Long id) {
+        log.debugf("${template.getNameCapitalize()}RestClientWrapper.deleteById %d", id);
+        return service.deleteById(id);
+    }
+
+    @Override
+    public Uni<PageData<${template.getNameCapitalize()}Model>> getPage( PageRequest pageRequest) {
+        log.debugf("${template.getNameCapitalize()}RestClientWrapper.getPage requestParameter: %s , pageRequest: %s",pageRequest);
+        return service.getPage(pageRequest);
+    }
+}

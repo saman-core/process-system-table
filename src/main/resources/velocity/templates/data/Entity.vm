@@ -1,0 +1,72 @@
+package ${template.getPackageComplete()}.entity;
+
+import lombok.Getter;
+import lombok.Setter;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import jakarta.persistence.*;
+import java.io.Serial;
+import java.io.Serializable;
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Parameter;
+
+@Entity
+@Getter
+@Setter
+@Table(name = "$template.getTableName()"
+#if($template.evaluateIfAnyFieldIsIndex())
+    , indexes = {
+         ${template.getAllIndexFromField()}
+    }
+#end
+)
+public class ${template.getNameCapitalize()}Entity implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
+
+    @Id
+    @GeneratedValue(generator = "sequence-${template.getTableName()}")
+    @GenericGenerator(
+        name = "sequence-${template.getTableName()}",
+        strategy = "org.hibernate.id.enhanced.SequenceStyleGenerator",
+        parameters = {
+            @Parameter(name = "sequence_name", value = "$template.getSequenceName()"),
+            @Parameter(name = "increment_size", value = "1")
+        }
+    )
+    @Column(name = "$template.getIdColumn()", unique = true, nullable = false)
+    private Long id;
+
+#foreach ($field in $template.getAllFieldToPersist())
+#set ($annotations = ${field.getAllAnnotationToEntity()})
+#foreach($annotation in $annotations)
+    $annotation
+#end
+    private ${field.getObjectTypeToEntity()} ${field.getKey()};
+#end
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ${template.getNameCapitalize()}Entity that = (${template.getNameCapitalize()}Entity) o;
+        return new EqualsBuilder().append(id, that.id)
+#foreach ($field in $template.getAllFieldToPersist())
+                .append(${field.getKey()}, that.${field.getKey()})
+#end
+                .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37)
+                .append(id)
+#foreach ($field in $template.getAllFieldToPersist())
+#if(${field.getIsPersistent()})
+                .append(${field.getKey()})
+#end
+#end
+                .toHashCode();
+    }
+}

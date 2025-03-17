@@ -1,0 +1,80 @@
+package ${template.getPackageComplete()}.transformer;
+
+import org.jboss.logging.Logger;
+import io.samancore.common.transformer.GenericTransformer;
+import io.samancore.common.error.message.TechnicalExceptionsEnum;
+import ${template.getPackageComplete()}.entity.${template.getNameCapitalize()}Entity;
+import ${template.getPackageComplete()}.model.${template.getNameCapitalize()}Model;
+import io.samancore.common.error.util.ExceptionHandler;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+
+@ApplicationScoped
+public class  ${template.getNameCapitalize()}Transformer extends GenericTransformer<${template.getNameCapitalize()}Entity, ${template.getNameCapitalize()}Model> {
+
+    @Inject
+    Logger log;
+
+#set ($injects = ${template.getInjectToTransform()})
+#foreach($inject in $injects)
+    $inject
+#end
+
+    public ${template.getNameCapitalize()}Entity toEntity(${template.getNameCapitalize()}Model model) {
+        try {
+            log.debugf("${template.getNameCapitalize()}Transformer.toEntity model: %s", model);
+            #if(${template.evaluateIfAnyFieldNeedPairToEntity()})
+            #foreach ($field in $template.getAllFieldWithPairToEntity())
+            ${field.getPairTransformToEntity()}
+            #end
+            ${template.getTransformToEntity()}
+            #else
+            return transformToEntity(model);
+            #end
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            throw ExceptionHandler.throwNotFoundOrLocal(TechnicalExceptionsEnum.TRANSFORMER_OBJECT_ERROR, e);
+        }
+    }
+
+    public ${template.getNameCapitalize()}Model toModel(${template.getNameCapitalize()}Entity entity) {
+        try {
+            log.debugf("${template.getNameCapitalize()}Transformer.toModel entity: %s", entity);
+            #if(${template.evaluateIfAnyFieldNeedPairToModel()})
+            #foreach ($field in $template.getAllFieldWithPairToModel())
+            ${field.getPairTransformToModel()}
+            #end
+            ${template.getTransformToModel()}
+            #else
+            return transformToModel(entity);
+            #end
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            throw ExceptionHandler.throwNotFoundOrLocal(TechnicalExceptionsEnum.TRANSFORMER_OBJECT_ERROR, e);
+        }
+    }
+
+    public ${template.getNameCapitalize()}Entity copyToAttached(${template.getNameCapitalize()}Entity detached, ${template.getNameCapitalize()}Entity attached) {
+        try {
+            log.debugf("${template.getNameCapitalize()}Transformer.copyToAttached");
+            return transformCopyToAttached(detached, attached);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            throw ExceptionHandler.throwNotFoundOrLocal(TechnicalExceptionsEnum.TRANSFORMER_OBJECT_ERROR, e);
+        }
+    }
+
+    #foreach ($field in $template.getAllFieldWithPairToEntity())
+    #set ($transformMethod = ${field.getMethodTransformToEntity()})
+    #foreach($transformMethodLine in $transformMethod)
+        $transformMethodLine
+    #end
+    #end
+    #foreach ($field in $template.getAllFieldWithPairToModel())
+    #set ($transformMethod_ = ${field.getMethodTransformToModel()})
+    #foreach($transformMethodLine_ in $transformMethod_)
+        $transformMethodLine_
+    #end
+    #end
+}

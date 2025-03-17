@@ -1,0 +1,20 @@
+package ${template.getPackageComplete()}.service;
+
+import ${template.getPackageComplete()}.model.${template.getNameCapitalize()}Model;
+import ${template.getPackageComplete()}.request.parameter.${template.getNameCapitalize()}RequestParameter;
+import io.smallrye.mutiny.Uni;
+import io.samancore.common.model.PageData;
+import io.samancore.common.page.PageRequest;
+
+public interface ${template.getNameCapitalize()}Service {
+
+    Uni<${template.getNameCapitalize()}Model> getById(Long id);
+
+    Uni<${template.getNameCapitalize()}Model> create(${template.getNameCapitalize()}Model model);
+
+    Uni<${template.getNameCapitalize()}Model> update(${template.getNameCapitalize()}Model model);
+
+    Uni<Boolean> deleteById(Long id);
+
+    Uni<PageData<${template.getNameCapitalize()}Model>> getPage(${template.getNameCapitalize()}RequestParameter requestParameter, PageRequest pageRequest);
+}

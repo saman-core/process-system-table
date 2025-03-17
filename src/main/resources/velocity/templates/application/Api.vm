@@ -1,0 +1,95 @@
+package ${template.getPackageComplete()}.api;
+
+import ${template.getPackageComplete()}.model.${template.getNameCapitalize()}Model;
+import ${template.getPackageComplete()}.request.parameter.${template.getNameCapitalize()}RequestParameter;
+import ${template.getPackageComplete()}.service.${template.getNameCapitalize()}Service;
+import io.samancore.common.error.message.TechnicalExceptionsEnum;
+import io.samancore.common.error.util.ExceptionHandler;
+import org.apache.commons.lang3.time.DateUtils;
+import io.smallrye.mutiny.Uni;
+import org.jboss.logging.Logger;
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.annotation.security.RolesAllowed;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.UriInfo;
+import io.samancore.common.model.PageData;
+import io.samancore.common.page.PageRequest;
+import io.samancore.common.page.PageUtil;
+
+@Path("")
+@Consumes(MediaType.APPLICATION_JSON)
+@Produces(MediaType.APPLICATION_JSON)
+public class ${template.getNameCapitalize()}Api {
+
+    @Inject
+    Logger log;
+
+    @Context
+    UriInfo uriInfo;
+
+    @Inject
+    ${template.getNameCapitalize()}Service service;
+
+    @GET
+    @Path("/{id}")
+    @RolesAllowed({"admin"})
+    public Uni<${template.getNameCapitalize()}Model> getById(@PathParam("id") long id) {
+        log.debugf("${template.getNameCapitalize()}Api.getById %d ", id);
+        return service.getById(id);
+    }
+
+    @DELETE
+    @Path("/{id}")
+    @RolesAllowed({"admin"})
+    public Uni<Boolean> deleteById(@PathParam("id") Long id) {
+        log.debugf("${template.getNameCapitalize()}Api.deleteById %d ", id);
+        return service.deleteById(id);
+    }
+
+   @POST
+   @Path("/")
+   @RolesAllowed({"admin"})
+   public Uni<${template.getNameCapitalize()}Model> create(${template.getNameCapitalize()}Model ${template.getNameLowerCase()}Model) {
+        log.debug("${template.getNameCapitalize()}Api.create");
+        return service.create(${template.getNameLowerCase()}Model);
+   }
+
+   @PUT
+   @Path("/")
+   @RolesAllowed({"admin"})
+   public Uni<${template.getNameCapitalize()}Model> update(${template.getNameCapitalize()}Model ${template.getNameLowerCase()}Model) {
+        log.debug("${template.getNameCapitalize()}Api.update");
+        return service.update(${template.getNameLowerCase()}Model);
+   }
+
+   @GET
+   @Path("/")
+   @RolesAllowed({"admin"})
+   public Uni<PageData<${template.getNameCapitalize()}Model>> getPage() {
+       log.debug("${template.getNameCapitalize()}Api.getPage");
+       var queryParameters = uriInfo.getQueryParameters();
+       var pageRequest = PageUtil.getPage(queryParameters);
+       return service.getPage(getRequestParameter(queryParameters), pageRequest);
+   }
+
+   private ${template.getNameCapitalize()}RequestParameter getRequestParameter(MultivaluedMap<String, String> queryParameters) {
+        try {
+            var requestParameterBuilder = ${template.getNameCapitalize()}RequestParameter.newBuilder();
+            if (queryParameters.containsKey("id")) {
+                requestParameterBuilder.setId(Long.valueOf(queryParameters.getFirst("id")));
+            }
+            #foreach ($field in $template.getAllFieldToFilter())
+            if (queryParameters.containsKey("${field.getKey()}")) {
+                requestParameterBuilder.set${field.getKeyFormatted()}($field.getConversionFromStringToObjectType("queryParameters"));
+            }
+            #end
+            return requestParameterBuilder.build();
+        } catch(Exception e) {
+            log.error("${template.getNameCapitalize()}Api.getRequestParameter", e);
+            throw new BadRequestException("Any query parameter is invalid", e);
+        }
+   }
+}
